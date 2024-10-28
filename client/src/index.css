@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind base;
+
+:root {
+ max-width:100%;
+  margin:0;
+  padding:0; 
+  border:0;
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+body {
+  margin: 0; /* Ensure there's no default margin */
+}
