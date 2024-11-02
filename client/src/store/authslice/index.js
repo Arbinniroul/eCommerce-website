@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit'; // Corrected import statement
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
     isAuthenticated: false,
@@ -6,23 +7,50 @@ const initialState = {
     user: null,
 };
 
+// Async thunk for registration
+export const registerUser = createAsyncThunk(
+    'auth/register',
+    async (formData) => {
+        const response = await axios.post('http://localhost:8000/api/auth/register', formData, {
+            withCredentials: true
+        });
+        return response.data;
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: { // Fixed 'reducer' to 'reducers'
+    reducers: {
         setUser: (state, action) => {
-            state.user = action.payload; // Set the user data
-            state.isAuthenticated = !!action.payload; // Update authentication status
+            state.user = action.payload;
+            state.isAuthenticated = !!action.payload;
         },
         setLoading: (state, action) => {
-            state.isLoading = action.payload; // Update loading state
+            state.isLoading = action.payload;
         },
         logout: (state) => {
-            state.user = null; // Clear user data on logout
-            state.isAuthenticated = false; // Set authentication status to false
+            state.user = null;
+            state.isAuthenticated = false;
         },
     },
+    extraReducers: (builder) => {
+        builder
+            .addCase(registerUser.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(registerUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = true;
+            })
+            .addCase(registerUser.rejected, (state) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+            });
+    }
 });
 
-export const { setUser, setLoading, logout } = authSlice.actions; // Export actions
-export default authSlice.reducer; // Export the reducer
+export const { setUser, setLoading, logout } = authSlice.actions;
+export default authSlice.reducer;
