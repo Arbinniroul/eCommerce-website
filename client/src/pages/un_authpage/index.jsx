@@ -1,6 +1,6 @@
  function UnAuthPage() {
    return (
-    <div>You dont have access to this page</div>
+    <div>You don't have access to this page</div>
    );
  };
  

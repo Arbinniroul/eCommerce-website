@@ -5,7 +5,7 @@
   "scripts": {
     "test": " ",
     "start":"server.js",
-    "dev":"nodemon server.js"
+    "yoo":"nodemon server.js"
   },
   "author": "orbean niroula",
   "license": "ISC",

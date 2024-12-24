@@ -1,6 +1,6 @@
 import { Label } from "../ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
-import { Button} from "../ui/button";
+import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 
@@ -10,7 +10,7 @@ export const types = {
   TEXTAREA: 'textarea'
 };
 
-function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText }) {
+function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText,isBtnDisabled }) {
   function rendersInputByComponentType(controlItem) {
     const value = formData[controlItem.name] || '';
     let element;
@@ -25,7 +25,7 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
             type={controlItem.type}
             value={value}
             onChange={event => setFormData({ ...formData, [controlItem.name]: event.target.value })}
-            className="input-class " // Optional custom class
+            className="input-class"
           />
         );
         break;
@@ -37,14 +37,16 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
             name={controlItem.name}
             id={controlItem.name}
             value={value}
-            className="select-class" // Optional custom class
+            className="select-class"
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={controlItem.placeholder} />
+              <SelectValue placeholder={controlItem.label} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white shadow-lg rounded-md"> {/* Add background color and shadow */}
               {controlItem.options.map(option => (
-                <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
+                <SelectItem key={option.id} value={option.id} className="bg-white hover:bg-gray-100"> {/* Set item background */}
+                  {option.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -59,7 +61,7 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
             id={controlItem.name}
             value={value}
             onChange={event => setFormData({ ...formData, [controlItem.name]: event.target.value })}
-            className="textarea-class" // Optional custom class
+            className="textarea-class"
           />
         );
         break;
@@ -73,7 +75,7 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
             type={controlItem.type}
             value={value}
             onChange={event => setFormData({ ...formData, [controlItem.name]: event.target.value })}
-            className="input-class" // Optional custom class
+            className="input-class"
           />
         );
         break;
@@ -90,7 +92,9 @@ function CommonForm({ formControls, formData, setFormData, onSubmit, buttonText 
           {rendersInputByComponentType(controlItem)}
         </div>
       ))}
-      <Button type="submit" className="mt-2 w-full bg-black text-white" variant="outline">{buttonText || 'Submit'}</Button>
+      <Button disabled={isBtnDisabled} type="submit" className="mt-2 w-full bg-black text-white" variant="outline">
+        {buttonText || 'Submit'}
+      </Button>
     </form>
   );
 }

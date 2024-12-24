@@ -16,8 +16,7 @@ const userSchema=new mongoose.Schema({
     
  },
  roll:{
-    type:String,
-    default:'user',
+    type:String
  }
 })
 const User=mongoose.model('User',userSchema);

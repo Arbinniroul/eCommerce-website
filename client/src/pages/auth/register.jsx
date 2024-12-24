@@ -4,7 +4,10 @@ import { registerUser } from "@/store/authslice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-
+import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
 const initialState = {
   userName: '',
   email: '',
@@ -15,18 +18,35 @@ function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const { toast } = useToast()
   function onSubmit(event) {
     event.preventDefault();
     dispatch(registerUser(formData))
       .then((response) => {
-        console.log(response.payload); // Check the response data
-        navigate('/somepath'); // Redirect after successful registration
+        if (response?.payload?.success) {
+          navigate('/auth/login');
+          toast({
+            title: "Registration successful",
+            description: "Your account has been created!",
+          });
+          
+        }
+        toast({
+          title: response?.payload?.message,
+          variant: "destructive" ,
+        });
+        console.log(response); // Check the response data
       })
       .catch((error) => {
         console.error("Registration failed:", error); // Log any errors
+        toast({
+          title: "Registration failed",
+          description: "Please check your details and try again.",
+          status: "error",
+        });
       });
-    console.log(formData);
+      
+
   }
 
   return (

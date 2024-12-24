@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser'); // Corrected import
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const authRouter = require('./routes/auth/authRoutes');
-
+const adminProductsRouter=require('./routes/admin/products-routes')
+const shopProductsRouter=require('./routes/shop/product-routes')
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://arbinniroula21:Hello123@cluster0.er7tx.mongodb.net/')
     .then(() => {
@@ -17,22 +18,24 @@ const PORT = process.env.PORT || 8000;
 // Middleware
 app.use(
     cors({
-        origin: 'http://localhost:5173', // Removed trailing slash
+        origin: 'http://localhost:5173', // Frontend URL without trailing slash
         methods: ['GET', 'POST', 'DELETE', 'PUT'],
         allowedHeaders: [
             'Content-Type',
-            'Authorization', // Removed extra space
+            'Authorization',
             'Cache-Control',
             'Expires',
             'Pragma'
-        ]
+        ],
+        credentials: true // Allows cookies and credentials to be sent
     })
 );
 app.use(cookieParser());
 app.use(express.json());
-
+app.use("/api/admin/products", adminProductsRouter);
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/shop/products',shopProductsRouter)
 
 // Start the server
 app.listen(PORT, () => {

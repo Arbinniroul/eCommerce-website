@@ -1,4 +1,7 @@
-import { Routes, Route } from 'react-router-dom'; // Import Routes and Route 
+import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkAuth } from './store/authslice/index'; // Ensure to import the correct thunk
 import AuthLayout from './components/auth/layout';
 import AuthRegister from './pages/auth/register';
 import AuthLogin from './pages/auth/login';
@@ -8,7 +11,6 @@ import AdminProducts from './pages/adminView/products';
 import AdminOrders from './pages/adminView/orders';
 import AdminFeatures from './pages/adminView/features';
 import ShoppingLayout from './components/shoppingView/Layout';
-
 import ShoppingHome from './pages/shoppingView/Home';
 import ShoppingListing from './pages/shoppingView/listing';
 import ShoppingCheckout from './pages/shoppingView/checkout';
@@ -16,54 +18,62 @@ import ShoppingAccount from './pages/shoppingView/account';
 import CheckAuth from './components/common/check-auth';
 import UnAuthPage from './pages/un_authpage';
 import NotFound from './pages/notfound';
+import { Skeleton } from "@/components/ui/skeleton";
 
 function App() {
-  const isAuthenticated = false; // Set authentication status
-  const user = null; // Set user information
+  const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Dispatch the checkAuth action to verify user session on page load
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <div>
+        <Skeleton className="w-[800px] bg-black h-[600px]" />
+      </div>
+    );
+  }
 
   return (
-    <div className='flex w-full flex-col min-h-screen bg-white overflow-hidden'>
-      {/* Common components */}
-      <div className='flex-grow'>
+    <div className="flex w-full flex-col min-h-screen bg-white overflow-hidden">
+      <div className="flex-grow">
         <Routes>
-          {/* Main route for /auth */}
-          <Route path="/auth" element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
-            </CheckAuth>
-          }>
-            {/* Nested routes relative to /auth */}
+          {/* Auth routes */}
+          <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<AuthLogin />} />
             <Route path="register" element={<AuthRegister />} />
           </Route>
 
-          {/* Main route for /admin */}
+          {/* Admin routes */}
           <Route path="/admin" element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth>
               <AdminLayout />
             </CheckAuth>
-          }> 
+          }>
             <Route path="dashboard" element={<AdminDashBoard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="features" element={<AdminFeatures />} />
           </Route>
 
-          {/* Main route for /shop */}
+          {/* Shopping routes */}
           <Route path="/shop" element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth>
               <ShoppingLayout />
             </CheckAuth>
-          }> 
+          }>
             <Route path="home" element={<ShoppingHome />} />
             <Route path="listing" element={<ShoppingListing />} />
             <Route path="checkout" element={<ShoppingCheckout />} />
             <Route path="account" element={<ShoppingAccount />} />
           </Route>
 
-          {/* Not Found route */}
-          <Route path="*" element={ <NotFound/>} />
-          <Route path="/un-authPage" element={<UnAuthPage />} />
+          {/* Unauthenticated and Not Found routes */}
+          <Route path="/unauth-page" element={<UnAuthPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </div>
