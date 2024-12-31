@@ -1,16 +1,14 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "server.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
-      }
-    ]
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "env": {
+    "MONGODB_URL": "mongodb+srv://arbinniroula21:Hello123@cluster0.er7tx.mongodb.net/",   // Replace with your MongoDB URL in Vercel secrets
+    "NODE_ENV": "production",
+    "PORT": "8000"
   }
-  
+}
