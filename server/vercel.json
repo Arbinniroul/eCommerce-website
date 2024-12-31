@@ -7,7 +7,7 @@
     }
   ],
   "env": {
-    "MONGODB_URL": "mongodb+srv://arbinniroula21:Hello123@cluster0.er7tx.mongodb.net/",   // Replace with your MongoDB URL in Vercel secrets
+    "MONGODB_URL": "mongodb+srv://arbinniroula21:Hello123@cluster0.er7tx.mongodb.net/",   
     "NODE_ENV": "production",
     "PORT": "8000"
   }
