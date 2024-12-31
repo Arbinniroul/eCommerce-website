@@ -20,7 +20,9 @@ const PORT = process.env.PORT || 8000;
 // Middleware
 app.use(
     cors({
-        origin: 'http://localhost:5173', // Frontend URL without trailing slash
+        origin: process.env.NODE_ENV === 'production'
+            ? 'https://e-commerce-website-wv1o.vercel.app'
+            : 'http://localhost:5173'  , // Frontend URL without trailing slash
         methods: ['GET', 'POST', 'DELETE', 'PUT'],
         allowedHeaders: [
             'Content-Type',
@@ -38,7 +40,9 @@ app.use("/api/admin/products", adminProductsRouter);
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/shop/products',shopProductsRouter)
-
+app.get('/',(req,res)=>{
+    res.json("Hello");
+})
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
