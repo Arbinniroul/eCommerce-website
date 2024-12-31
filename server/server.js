@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -6,7 +7,8 @@ const authRouter = require('./routes/auth/authRoutes');
 const adminProductsRouter=require('./routes/admin/products-routes')
 const shopProductsRouter=require('./routes/shop/product-routes')
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://arbinniroula21:Hello123@cluster0.er7tx.mongodb.net/')
+mongoose.connect(process.env.MONGODB_URL)
+''
     .then(() => {
         console.log("MONGODB connected");
     })
