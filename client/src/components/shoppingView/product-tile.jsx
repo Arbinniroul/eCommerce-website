@@ -1,16 +1,17 @@
+import { brandOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
-function ShoppingProductTile({ product }) {
+function ShoppingProductTile({ product,handleGetProductDetails }) {
   return (
-    <Card className="w-full max-w-sm mx-auto">
+    <Card className="w-full relative  max-w-sm mx-5 shadow-lg hover:shadow-2xl" onClick={()=>handleGetProductDetails(product?._id)}>
       <div>
-        <div className="relative">
+        <div className="relative ">
           <img
             src={product.image}
             alt={product.title}
-            className="w-full h-[300px] object-cover rounded-t-lg"
+            className="w-full h-[400px] object-cover rounded-t-lg "
           />
           {product?.salePrice > 0 ? (
             <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
@@ -25,7 +26,7 @@ function ShoppingProductTile({ product }) {
               {product?.category}
             </span>
             <span className="text-sm text-muted-foreground">
-              {product?.brand}
+              {brandOptionsMap[product?.brand]}
             </span>
           </div>
           <div className="flex justify-between items-center mb-2">
@@ -45,8 +46,8 @@ function ShoppingProductTile({ product }) {
             )}
           </div>
         </CardContent>
-        <CardFooter>
-            <Button classname="w-full">
+        <CardFooter className='flex justify-center items-center w-100'>
+            <Button className="w-100 h-12 w-60 text-xl rounded-md" >
              Add to Cart
             </Button>
         </CardFooter>

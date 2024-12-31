@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const User=require('../../models/User');
 
 // Generate a unique secret for each user based on their user ID
 const generateUniqueSecret = (user) => {
