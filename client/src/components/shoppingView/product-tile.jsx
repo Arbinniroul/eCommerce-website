@@ -3,55 +3,61 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
-function ShoppingProductTile({ product,handleGetProductDetails }) {
+function ShoppingProductTile({ product, handleGetProductDetails,handleAddToCart }) {
   return (
-    <Card className="w-full relative  max-w-sm mx-5 shadow-lg hover:shadow-2xl" onClick={()=>handleGetProductDetails(product?._id)}>
+    <Card
+      className="w-full relative max-w-sm mx-5 shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out rounded-lg border border-gray-200"
+     
+    >
       <div>
-        <div className="relative ">
+        <div className="relative "  onClick={() => handleGetProductDetails(product?._id)}>
           <img
             src={product.image}
             alt={product.title}
-            className="w-full h-[400px] object-cover rounded-t-lg "
+            className="w-full h-[400px] object-cover rounded-t-lg transition-transform hover:scale-105 duration-300 ease-in-out"
           />
-          {product?.salePrice > 0 ? (
-            <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
+          {product?.salePrice > 0 && (
+            <Badge className="absolute top-3 left-3 bg-red-500 text-white text-sm px-2 py-1 rounded-md">
               Sale
             </Badge>
-          ) : null}
+          )}
         </div>
-        <CardContent className="p-4">
-          <h2 className="text-xl font-bold mb-2">{product?.title}</h2>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-muted-foreground">
+        <CardContent className="p-5">
+          <h2 className="text-2xl font-semibold mb-3 text-gray-800">
+            {product?.title}
+          </h2>
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm text-gray-500">
               {product?.category}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-gray-500">
               {brandOptionsMap[product?.brand]}
             </span>
           </div>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-4">
             {product?.salePrice > 0 ? (
               <>
-                <span className="text-lg font-semibold text-primary line-through">
+                <span className="text-lg font-semibold text-gray-500 line-through">
                   ${product?.price}
                 </span>
-                <span className="text-lg font-semibold text-red-600">
+                <span className="text-lg font-bold text-red-600">
                   ${product?.salePrice}
                 </span>
               </>
             ) : (
-              <span className="text-lg font-semibold text-primary">
+              <span className="text-lg font-bold text-gray-800">
                 ${product?.price}
               </span>
             )}
           </div>
         </CardContent>
-        <CardFooter className='flex justify-center items-center w-100'>
-            <Button className="w-100 h-12 w-60 text-xl rounded-md" >
-             Add to Cart
-            </Button>
-        </CardFooter>
+     
       </div>
+      <CardFooter className="flex justify-center items-center w-full py-4 bg-gray-50">
+          <Button onClick={()=>{handleAddToCart(product?._id)}} className="w-4/5 h-12 text-lg font-medium text-white hover:bg-blue-700">
+            Add to Cart
+          </Button>
+        </CardFooter>
     </Card>
   );
 }
