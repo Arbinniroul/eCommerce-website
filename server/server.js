@@ -1,49 +1,55 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const authRouter = require('./routes/auth/authRoutes');
-const adminProductsRouter=require('./routes/admin/products-routes')
-const shopProductsRouter=require('./routes/shop/product-routes')
-// Connect to MongoDB
+const adminProductsRouter = require('./routes/admin/products-routes');
+const adminOrderRouter = require('./routes/admin/order-routes');
+const shopProductsRouter = require('./routes/shop/product-routes');
+const shopCartRouter = require('./routes/shop/cart-routes');
+const shopAddressRouter = require('./routes/shop/addressRoutes');
+const shopOrderRouter = require('./routes/shop/orderRoutes');
+
 mongoose.connect(process.env.MONGODB_URL)
-''
-    .then(() => {
-        console.log("MONGODB connected");
-    })
-    .catch((error) => console.log(error));
+  .then(() => {
+    console.log("MONGODB connected");
+  })
+  .catch((error) => console.log(error));
+
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Middleware
-app.use(
-    cors({
-        origin: process.env.NODE_ENV === 'production'
-            ? 'https://e-commerce-website-wv1o.vercel.app'
-            : 'http://localhost:5173'  , // Frontend URL without trailing slash
-        methods: ['GET', 'POST', 'DELETE', 'PUT'],
-        allowedHeaders: [
-            'Content-Type',
-            'Authorization',
-            'Cache-Control',
-            'Expires',
-            'Pragma'
-        ],
-        credentials: true // Allows cookies and credentials to be sent
-    })
-);
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow your frontend domain
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'], // Explicitly allow all necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Expires', 'Pragma'], // Allow necessary headers
+  credentials: true, // Allow credentials (cookies, authorization headers)
+}));
+
+
+// Explicitly handle preflight requests (OPTIONS) for all routes
+app.options('*', cors());
+
+// Middleware 
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api/admin/products", adminProductsRouter);
+
 // Routes
+app.use('/api/admin/products', adminProductsRouter);
+app.use('/api/admin/orders', adminOrderRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/shop/products',shopProductsRouter)
-app.get('/',(req,res)=>{
-    res.json("Hello");
-})
-// Start the server
+app.use('/api/shop/products', shopProductsRouter);
+app.use('/api/shop/cart', shopCartRouter);
+app.use('/api/shop/address', shopAddressRouter);
+app.use('/api/shop/order', shopOrderRouter);
+
+app.get('/', (req, res) => {
+  res.json("Hello");
+});
+
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

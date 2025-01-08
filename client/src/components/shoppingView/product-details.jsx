@@ -9,15 +9,44 @@ import {
 import { Button } from "../ui/button";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { StarIcon } from "lucide-react";
 import { Input } from "../ui/input";
+import { addToCart, fetchCartItems } from "@/store/shop/cartslice";
+import { useToast } from "@/hooks/use-toast";
+import { setProductDetails } from "@/store/shop/productslice";
 
 export default function ProductDetailsDialog({ open, setOpen, productDetails }) {
+
   const {user}=useSelector((state)=>state.auth);
-  
+  const dispatch  = useDispatch();
+  const {toast}=useToast();
+    function handleAddToCart(getCurrentProductId) {
+    console.log({ userId: user?.id, productId: getCurrentProductId, quantity: 1 });
+
+    if (user && user?.id) {
+      dispatch(addToCart({ userId: user?.id, productId: getCurrentProductId, quantity: 1 }))
+        .then((data) => {
+          if (data.payload.success) {
+            dispatch(fetchCartItems({ userId: user.id }));
+            toast({
+              title: 'Product is Added to cart',
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+        });
+    } else {
+      console.error("User is not logged in.");
+    }
+  }
+ function handleDialogClose(){
+  setOpen(false);
+  dispatch(setProductDetails())
+ }
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       {/* Dialog Trigger Button */}
       <DialogTrigger asChild>
         <button className="hidden">Open Product Details</button>
@@ -71,7 +100,7 @@ export default function ProductDetailsDialog({ open, setOpen, productDetails }) 
               <span className="text-muted-foreground">(4.5)</span>
           </div>
           <div className="mt-5 mb-10 ">
-            <Button className='w-full py-6 text-xl bg-black'>Add to Cart</Button>
+            <Button onClick={()=>handleAddToCart(productDetails?._id)} className='w-full py-6 text-xl bg-black'>Add to Cart</Button>
           </div>       
        <hr  className="border border-double border-black-100  mt-4"/>
       <div className="max-h-[300px] overflow-auto">

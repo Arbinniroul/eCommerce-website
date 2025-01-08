@@ -16,6 +16,7 @@ import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "@/components/shoppingView/product-details";
 import ProductFilter from "./filter"; // Importing the filter component
 import { addToCart, fetchCartItems } from "@/store/shop/cartslice";
+import { useToast } from "@/hooks/use-toast";
 
 // Helper function to create query parameters from filter data
 function createSearchParamsHelper(filterParams) {
@@ -26,9 +27,8 @@ function createSearchParamsHelper(filterParams) {
       queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-  return queryParams.join("&"); 
+  return queryParams.join("&");
 }
-
 
 export default function ShoppingListing() {
   const dispatch = useDispatch();
@@ -37,16 +37,21 @@ export default function ShoppingListing() {
   const [sort, setSort] = useState({});
   const { productList, productDetails } = useSelector((state) => state.shopProducts);
   const [searchParams, setSearchParams] = useSearchParams();
-  const {user}=useSelector((state) => state.auth);
-  const {cartItems}=useSelector((state) => state.cart); 
+  const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
+  const { toast } = useToast();
+
   function handleAddToCart(getCurrentProductId) {
     console.log({ userId: user?.id, productId: getCurrentProductId, quantity: 1 });
-  
-    if (user && user.id) {
-      dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
+
+    if (user && user?.id) {
+      dispatch(addToCart({ userId: user?.id, productId: getCurrentProductId, quantity: 1 }))
         .then((data) => {
           if (data.payload.success) {
-            dispatch(fetchCartItems({ userId: user.id }));  // Use correct key for userId
+            dispatch(fetchCartItems({ userId:user?.id}));
+            toast({
+              title: 'Product is Added to cart',
+            });
           }
         })
         .catch((error) => {
@@ -56,8 +61,7 @@ export default function ShoppingListing() {
       console.error("User is not logged in.");
     }
   }
-  
-  // Fetch products based on filter and sort parameters
+
   useEffect(() => {
     if (filters !== null && sort !== null)
       dispatch(fetchAllFilteredProduct({ filterParams: filters, sortParams: sort }));
@@ -70,7 +74,7 @@ export default function ShoppingListing() {
   function handleGetProductDetails(getCurrentProductId) {
     dispatch(getProductDetails(getCurrentProductId));
   }
- 
+
   function handleFilter(getSectionId, getCurrentOption) {
     let cpyFilter = { ...filters };
 
@@ -89,7 +93,6 @@ export default function ShoppingListing() {
     setFilters(cpyFilter);
   }
 
-  // Retrieve stored filters from sessionStorage
   useEffect(() => {
     const storedFilters = JSON.parse(sessionStorage.getItem("filters") || "{}");
     if (storedFilters) {
@@ -97,7 +100,6 @@ export default function ShoppingListing() {
     }
   }, []);
 
-  // Update search parameters whenever filters change
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
       const createQueryString = createSearchParamsHelper(filters);
@@ -105,13 +107,12 @@ export default function ShoppingListing() {
     }
   }, [filters]);
 
-  // Open details dialog when product details are fetched
   useEffect(() => {
-    if (productDetails?._id) {  
+    if (productDetails?._id) {
       setOpenDetailsDialog(true);
     }
   }, [productDetails]);
-console.log(cartItems);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6 py-6">
       <ProductFilter filters={filters} handleFilter={handleFilter} />
@@ -154,7 +155,7 @@ console.log(cartItems);
           {productList?.length > 0 ? (
             productList.map((product) => (
               <ShoppingProductTile
-              handleAddToCart={handleAddToCart}
+                handleAddToCart={handleAddToCart}
                 key={product.id}
                 handleGetProductDetails={handleGetProductDetails}
                 product={product}

@@ -4,13 +4,14 @@
   "main": "server.js",
   "scripts": {
     "test": " ",
-    "start":"node server.js",
-    "yoo":"nodemon server.js"
+    "start": "node server.js",
+    "yoo": "nodemon server.js"
   },
   "author": "orbean niroula",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",

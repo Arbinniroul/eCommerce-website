@@ -18,57 +18,74 @@ import { logoutUser } from "@/store/authslice";
 import { Sheet } from "../ui/sheet";
 import UserCartWrapper from "./cart-wrapper";
 import { fetchCartItems } from "@/store/shop/cartslice";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { getProductDetails } from "@/store/shop/productslice";
+import { set } from "mongoose";
 
-function MenuItems() {
+const handleNavigateToListingPage = (getCurrentMenuItem, navigate) => {
+  sessionStorage.removeItem('filters');
+  const currentFilters = getCurrentMenuItem.id !== "home" ? {
+    category: [getCurrentMenuItem.id]
+  } : null;
+  sessionStorage.setItem('filters', JSON.stringify(currentFilters));
+  navigate(getCurrentMenuItem.path);
+};
+
+const MenuItems = () => {
+  const navigate = useNavigate();
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Link className="text-sm font-medium cursor-pointer" key={menuItem.id} to={menuItem.path}>
+        <Label
+          key={menuItem.id}
+          onClick={() => handleNavigateToListingPage(menuItem, navigate)}
+          className="text-sm font-medium cursor-pointer"
+        >
           {menuItem.label}
-        </Link>
+        </Label>
       ))}
     </nav>
   );
-}
+};
 
-function HeaderRightContent() {
-  const [openCartSheet,setOpenCartSheet]=useState(false)
+const HeaderRightContent = () => {
+  const [openCartSheet, setOpenCartSheet] = useState(false);
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const {cartItems}=useSelector((state) => state.cart); 
+  const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
 
-
-  function handleLogout() {
+  const handleLogout = () => {
     dispatch(logoutUser());
-  }
+  };
+
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchCartItems(user.id));
+      dispatch(fetchCartItems({ userId:user?.id }));
+      
     }
   }, [dispatch, user?.id]);
-  
+  console.log(cartItems);
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-  <Sheet open={openCartSheet} onOpenChange={(open) => setOpenCartSheet(open)}>
-  <Button
-    onClick={() => setOpenCartSheet(true)}
-    variant="outline"
-    size="icon"
-    className="relative"
-  >
-    <ShoppingCart className="w-6 h-6" />
-    <span className="sr-only">User Cart</span>
-  </Button>
-  <UserCartWrapper cartItems={cartItems && cartItems.items && cartItems.items.length>0? cartItems.items:[]}/>
-</Sheet>
-
+      <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+        <Button
+          onClick={() => setOpenCartSheet(true)}
+          variant="outline"
+          size="icon"
+          className="relative"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <span className="sr-only">User Cart</span>
+        </Button>
+        <UserCartWrapper setOpenCartSheet={setOpenCartSheet } cartItems={cartItems?.items?.length > 0 ? cartItems.items : []} />
+      </Sheet>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-black rounded-full w-8 h-8 flex items-center justify-center">
             <AvatarFallback className="text-xs bg-black text-white font-extrabold">
-              {user?.userName[0].toUpperCase()}
+              {user?.userName?.[0]?.toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -97,9 +114,9 @@ function HeaderRightContent() {
       </DropdownMenu>
     </div>
   );
-}
+};
 
-function ShoppingHeader() {
+const ShoppingHeader = () => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -142,6 +159,6 @@ function ShoppingHeader() {
       </div>
     </header>
   );
-}
+};
 
 export default ShoppingHeader;
