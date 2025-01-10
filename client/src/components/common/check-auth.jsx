@@ -7,6 +7,20 @@ function CheckAuth({ children }) {
 
   console.log(location.pathname, isAuthenticated);
 
+  if(location.pathname === '/'){
+    if(!isAuthenticated){
+      return <Navigate to="/auth/login" />;
+    }
+    else{
+      if (
+        isAuthenticated &&
+        user?.roll !== "admin" &&
+        location.pathname.includes("admin")
+      ) {
+        return <Navigate to="/unauth-page" />;
+      }
+    }
+  }
   if (location.pathname === "/") {
     if (!isAuthenticated) {
       return <Navigate to="/auth/login" />;

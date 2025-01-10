@@ -15,7 +15,8 @@ function ShoppingCheckout() {
   const [isPaymentStart, setIsPaymentStart] = useState(false);
   const dispatch = useDispatch();
   const { toast } = useToast();
-  
+  const{productList}=useSelector(state=>state.shopProducts);
+
   useEffect(() => {
     if (approvalURL && isPaymentStart) {
       window.location.href = approvalURL;
@@ -49,6 +50,7 @@ function ShoppingCheckout() {
         image: singleCartItem?.productId.image,
         price: singleCartItem?.productId.salePrice > 0 ? singleCartItem?.productId.salePrice : singleCartItem?.productId.price,
         quantity: singleCartItem?.quantity,
+        totalStock: productList?.totalStock,
       })),
       addressInfo: {
         addressId: currentSelectedAddress?._id,
@@ -109,7 +111,7 @@ function ShoppingCheckout() {
         <img src={img} alt="" className="h-full w-full object-cover object-center" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5">
-        <Address setCurrentSelectedAddress={setCurrentSelectedAddress} />
+        <Address selectedId={currentSelectedAddress?._id} setCurrentSelectedAddress={setCurrentSelectedAddress} />
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => <UserCartItemsContent cartItem={item} />)
@@ -122,10 +124,10 @@ function ShoppingCheckout() {
           </div>
           <div className="mt-4 w-full">
             <Button onClick={handleInitiatePaypalPayment} className="w-full">
-              Checkout with PayPal
+              {isPaymentStart ? "Proccessing paypal Payment..." : "Checkout with PayPal"}
             </Button>
-          </div>
-        </div>
+            </div>
+            </div>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { addAddress, deleteAddress, editAddress, fetchAllAddress } from "@/store
 import AddressCard from "./addressCard";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Address({setCurrentSelectedAddress}) {
+export default function Address({setCurrentSelectedAddress,selectedId }) {
   const dispatch = useDispatch();
   const[currentEditedId,setCurrentEditedId]=useState(null);
   const { user } = useSelector(state => state.auth);
@@ -101,6 +101,7 @@ export default function Address({setCurrentSelectedAddress}) {
         {addressList?.length > 0 ? (
           addressList.map(singleAddressItem => (
             <AddressCard 
+            selectedId={selectedId}
             setCurrentSelectedAddress={setCurrentSelectedAddress}
               key={singleAddressItem._id} 
               handleDeleteAddress={handleDeleteAddress} 

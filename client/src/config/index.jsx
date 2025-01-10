@@ -110,13 +110,22 @@ export const addProductFormElements = [
       label:'Home',
       path:'/shop/home'
 
-   },{
+   },
+   {
+    id:'products',
+    label:'Products',
+    path:'/shop/listing'
+    
+   
+    },
+    {
 
     id:'men',
     label:'Men',
     path:'/shop/listing'
 
  }
+
  ,{
 
   id:'women',
@@ -145,6 +154,13 @@ export const addProductFormElements = [
   label:'Accessories',
   path:'/shop/listing'
 
+},
+{
+
+  id:'search',
+  label:'Search', 
+  path:'/shop/search'
+
 }
 ]
 export const brandOptionsMap = {
@@ -160,8 +176,9 @@ export const filterOptions = {
     { id: "men", label: "Men" },
     { id: "women", label: "Women" },
     { id: "accessories", label: "accessories" },
+    { id: "kids", label: "Kids" },
     { id: "footwear", label: "Footwear" },
-
+    
  
   ],
   brand: [

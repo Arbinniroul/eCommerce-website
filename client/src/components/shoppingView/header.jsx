@@ -1,5 +1,5 @@
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogTrigger, DialogContent } from "@radix-ui/react-dialog";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,17 +22,25 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { getProductDetails } from "@/store/shop/productslice";
 import { set } from "mongoose";
 
-const handleNavigateToListingPage = (getCurrentMenuItem, navigate) => {
-  sessionStorage.removeItem('filters');
-  const currentFilters = getCurrentMenuItem.id !== "home" ? {
-    category: [getCurrentMenuItem.id]
-  } : null;
-  sessionStorage.setItem('filters', JSON.stringify(currentFilters));
-  navigate(getCurrentMenuItem.path);
-};
 
 const MenuItems = () => {
+  const location=useLocation();
   const navigate = useNavigate();
+  const [searchParams,setSearchParams] =useSearchParams();
+  const handleNavigateToListingPage = (getCurrentMenuItem, navigate) => {
+    sessionStorage.removeItem('filters');
+    const currentFilters = getCurrentMenuItem.id !== "home" &&  getCurrentMenuItem.id !== "products" && getCurrentMenuItem.id !== "search"? {
+      category: [getCurrentMenuItem.id]
+    } : null;
+    sessionStorage.setItem('filters', JSON.stringify(currentFilters));
+    location.pathname.includes("listing") && currentFilters !== null
+    ? setSearchParams(
+        new URLSearchParams(`?category=${getCurrentMenuItem.id}`)
+      )
+    : navigate(getCurrentMenuItem.path);
+}
+  
+  
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
@@ -64,7 +72,7 @@ const HeaderRightContent = () => {
       dispatch(fetchCartItems({ userId:user?.id }));
       
     }
-  }, [dispatch, user?.id]);
+  }, [dispatch, user?.id,]);
   console.log(cartItems);
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
@@ -76,7 +84,8 @@ const HeaderRightContent = () => {
           className="relative"
         >
           <ShoppingCart className="w-6 h-6" />
-          <span className="sr-only">User Cart</span>
+          <span className="absolute top-[-2px] right-0 font-extrabold text-sm">{cartItems?.items?.length}</span>
+         
         </Button>
         <UserCartWrapper setOpenCartSheet={setOpenCartSheet } cartItems={cartItems?.items?.length > 0 ? cartItems.items : []} />
       </Sheet>

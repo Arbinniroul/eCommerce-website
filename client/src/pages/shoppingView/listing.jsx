@@ -14,17 +14,15 @@ import { fetchAllFilteredProduct, getProductDetails } from "../../store/shop/pro
 import ShoppingProductTile from "@/components/shoppingView/product-tile";
 import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "@/components/shoppingView/product-details";
-import ProductFilter from "./filter"; // Importing the filter component
+import ProductFilter from "./filter"; 
 import { addToCart, fetchCartItems } from "@/store/shop/cartslice";
 import { useToast } from "@/hooks/use-toast";
 
-// Helper function to create query parameters from filter data
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
   for (const [key, value] of Object.entries(filterParams)) {
     if (Array.isArray(value) && value.length > 0) {
-      const paramValue = value.join(",");
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+      queryParams.push(`${key}=${encodeURIComponent(value.join(","))}`);
     }
   }
   return queryParams.join("&");
@@ -32,40 +30,75 @@ function createSearchParamsHelper(filterParams) {
 
 export default function ShoppingListing() {
   const dispatch = useDispatch();
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState(JSON.parse(sessionStorage.getItem("filters")) || {});
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [sort, setSort] = useState({});
+  const [sort, setSort] = useState("price-lowtohigh");
   const { productList, productDetails } = useSelector((state) => state.shopProducts);
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
   const { toast } = useToast();
+  const categorySearchParams = searchParams.get('category');
 
-  function handleAddToCart(getCurrentProductId) {
-    console.log({ userId: user?.id, productId: getCurrentProductId, quantity: 1 });
+  console.log(productList);
+  
+function handleAddToCart(getCurrentProductId, getTotalStock) {
+    
+    const getItems = cartItems.items; 
+    let getCartItems = getItems || [];
 
-    if (user && user?.id) {
-      dispatch(addToCart({ userId: user?.id, productId: getCurrentProductId, quantity: 1 }))
+    if (getCartItems.length) {
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId._id === getCurrentProductId
+      );
+      console.log(indexOfCurrentItem,'indexOfCurrentItem');
+      if (indexOfCurrentItem > -1) {
+        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+        
+        if (getQuantity + 1 > getTotalStock) {
+          toast({
+            title: `Only ${getQuantity} quantity can be added for this item`,
+            variant: "destructive",
+          });
+
+          return;
+      }
+    }
+  }
+
+    if (user?.id) {
+      dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
         .then((data) => {
           if (data.payload.success) {
-            dispatch(fetchCartItems({ userId:user?.id}));
-            toast({
-              title: 'Product is Added to cart',
-            });
+            dispatch(fetchCartItems({ userId: user.id }));
+            toast({ title: "Product added to cart." });
           }
         })
-        .catch((error) => {
-          console.error("Error adding to cart:", error);
-        });
+        .catch((error) => console.error("Error adding to cart:", error));
     } else {
       console.error("User is not logged in.");
     }
   }
+  useEffect(() => {
+    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  }, [categorySearchParams]);
 
   useEffect(() => {
-    if (filters !== null && sort !== null)
-      dispatch(fetchAllFilteredProduct({ filterParams: filters, sortParams: sort }));
-  }, [dispatch, sort, filters]);
+    if (filters && Object.keys(filters).length > 0) {
+      const createQueryString = createSearchParamsHelper(filters);
+      setSearchParams(new URLSearchParams(createQueryString));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    dispatch(fetchAllFilteredProduct({ filterParams: filters, sortParams: sort }));
+  }, [dispatch, sort, filters,cartItems]);
+
+  useEffect(() => {
+    if (productDetails?._id) {
+      setOpenDetailsDialog(true);
+    }
+  }, [productDetails]);
 
   function handleSort(value) {
     setSort(value);
@@ -76,8 +109,7 @@ export default function ShoppingListing() {
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-    let cpyFilter = { ...filters };
-
+    const cpyFilter = { ...filters };
     if (!cpyFilter[getSectionId]) {
       cpyFilter[getSectionId] = [getCurrentOption];
     } else {
@@ -88,30 +120,9 @@ export default function ShoppingListing() {
         cpyFilter[getSectionId].splice(indexOfCurrentOption, 1);
       }
     }
-
     sessionStorage.setItem("filters", JSON.stringify(cpyFilter));
     setFilters(cpyFilter);
   }
-
-  useEffect(() => {
-    const storedFilters = JSON.parse(sessionStorage.getItem("filters") || "{}");
-    if (storedFilters) {
-      setFilters(storedFilters);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (filters && Object.keys(filters).length > 0) {
-      const createQueryString = createSearchParamsHelper(filters);
-      setSearchParams(new URLSearchParams(createQueryString));
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    if (productDetails?._id) {
-      setOpenDetailsDialog(true);
-    }
-  }, [productDetails]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6 py-6">
@@ -120,22 +131,15 @@ export default function ShoppingListing() {
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-800">All Products</h2>
           <div className="flex items-center gap-3">
-            <span className="text-gray-500 text-sm ">{productList?.length} Products</span>
-            {/* Sort Dropdown Component */}
+            <span className="text-gray-500 text-sm">{productList?.length || 0} Products</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  className="flex items-center gap-1 border border-gray-300 rounded-md hover:bg-gray-100 hover:text-black px-2 py-1"
-                >
+                <Button size="sm" className="flex items-center gap-1 border border-gray-300 rounded-md hover:bg-gray-100 hover:text-black px-2 py-1">
                   <ArrowUpDownIcon className="h-4 w-4" />
                   <span>Sort by</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-44 z-40 bg-white border border-gray-300 rounded-md shadow-lg"
-              >
+              <DropdownMenuContent align="end" className="w-44 z-40 bg-white border border-gray-300 rounded-md shadow-lg">
                 <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
                     <DropdownMenuRadioItem

@@ -65,16 +65,17 @@ export default function AdminOrdersView() {
                   <TableCell>
                     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                       <DialogTrigger asChild>
-                        <Button onClick={() => handleFetchOrderDetails(orderItem._id)}>View Details</Button>
+                            
+                            <Button  onClick={() => {
+                            handleFetchOrderDetails(orderItem._id);
+                            setOpenDialog(true);
+                          }}>View Details</Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-lg p-6">
-                        <DialogHeader>
-                          <DialogTitle>Order Details</DialogTitle>
-                        </DialogHeader>
+                      
                         {orderDetails && selectedOrderId === orderItem._id && (
-                          <AdminOrderDetailsView orderDetails={orderDetails} />
+                          <AdminOrderDetailsView orderDetails={orderDetails}/>
                         )}
-                      </DialogContent>
+                   
                     </Dialog>
                   </TableCell>
                 </TableRow>

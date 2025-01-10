@@ -21,6 +21,7 @@ import NotFound from './pages/notfound';
 import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturn from './pages/shoppingView/paypalReturn';
 import PaymentSuccessPage from './pages/shoppingView/paymentSuccess';
+import SearchProducts from './components/shoppingView/search';
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
@@ -43,6 +44,11 @@ function App() {
     <div className="flex w-full flex-col min-h-screen bg-white overflow-hidden">
       <div className="flex-grow">
         <Routes>
+          <Route path='/'  element={
+            <CheckAuth>
+            </CheckAuth>} />
+
+
           {/* Auth routes */}
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<AuthLogin />} />
@@ -73,7 +79,7 @@ function App() {
             <Route path="account" element={<ShoppingAccount />} />
             <Route path="paypal-return" element= {<PaypalReturn/> } />
             <Route path="payment-success" element= {<PaymentSuccessPage/> } />
-
+            <Route path="search" element= {<SearchProducts/> } />
           </Route>
 
           {/* Unauthenticated and Not Found routes */}

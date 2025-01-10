@@ -1,75 +1,68 @@
-import { Minus, Plus, Trash } from "lucide-react";
+import { CloudCog, Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCartItems, fetchCartItems, updateCartQuantity } from "@/store/shop/cartslice";
+import {
+  deleteCartItems,
+  fetchCartItems,
+  updateCartQuantity,
+} from "@/store/shop/cartslice";
 import { useToast } from "@/hooks/use-toast";
 
 export default function UserCartItemsContent({ cartItem }) {
-  const { user } = useSelector((state) => state.auth);
-  const { cartItems } = useSelector((state) => state.cart); // This will automatically trigger re-render on state change
-  const { productList } = useSelector((state) => state.shopProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
+  const user = useSelector((state) => state.auth.user);
+  const cartItems = useSelector((state) => state.cart.cartItems?.items || []);
+  const {productList} = useSelector((state) => state.shopProducts);
+ console.log(productList,'productList');
+  function handleUpdateQuantity(cartItem, actionType) {
+    const productIndex = productList.findIndex(
+      (product) => product._id === cartItem.productId?._id
+    );
   
-  // Function to handle cart item quantity update
-  function handleUpdateQuantity(getCartItem, typeOfAction) {
-    if (typeOfAction === "plus") {
-      let getCartItems = cartItems.items || [];
-
-      if (getCartItems.length) {
-        const indexOfCurrentCartItem = getCartItems.findIndex(
-          (item) => item.productId === getCartItem?.productId
-        );
-
-        const getCurrentProductIndex = productList.findIndex(
-          (product) => product._id === getCartItem?.productId
-        );
-        const getTotalStock = productList[getCurrentProductIndex].totalStock;
-
-        if (indexOfCurrentCartItem > -1) {
-          const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
-          if (getQuantity + 1 > getTotalStock) {
-            toast({
-              title: `Only ${getQuantity} quantity can be added for this item`,
-              variant: "destructive",
-            });
-            return;
-          }
+    if (productIndex > -1) {
+      const totalStock = productList[productIndex].totalStock;
+      const cartItemIndex = cartItems.findIndex(
+        (item) => item.productId._id === cartItem.productId._id
+      );
+  
+      if (actionType === "plus" && cartItemIndex > -1) {
+        if (cartItems[cartItemIndex].quantity + 1 > totalStock) {
+          toast({
+            title: `Only ${totalStock} quantity available for this item`,
+            variant: "destructive",
+          });
+          return;
         }
       }
+  
+      if (cartItemIndex > -1) {
+        dispatch(
+          updateCartQuantity({
+            userId: user?.id,
+            productId: cartItem?.productId?._id,
+            quantity: actionType === "plus"
+              ? cartItems[cartItemIndex].quantity + 1
+              : cartItems[cartItemIndex].quantity - 1,
+          })
+        ).then((response) => {
+          if (response.payload?.success) {
+            dispatch(fetchCartItems({ userId: user?.id }));
+            toast({ title: "Cart item updated successfully" });
+          }
+        });
+      }
     }
-
-    dispatch(
-      updateCartQuantity({
-        userId: user?.id,
-        productId: getCartItem?.productId,
-        quantity:
-          typeOfAction === "plus"
-            ? getCartItem?.quantity + 1
-            : getCartItem?.quantity - 1,
-      })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        toast({
-          title: "Cart item is updated successfully",
-        });
-      }
-    });
   }
-
-  // Function to handle cart item deletion
-  function handleCartItemDelete(getCartItem) {
-    console.log(user?.id,"userid");
+  
+  function handleCartItemDelete(cartItem) {
     dispatch(
-      deleteCartItems({ userId: user?.id, productId: getCartItem?.productId._id })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchCartItems({userId:user?.id}));
-        toast({
-          title: "Cart item is deleted successfully",
-        });
-      }
-      else{
+      deleteCartItems({ userId: user?.id, productId: cartItem.productId?._id })
+    ).then((response) => {
+      if (response.payload?.success) {
+        dispatch(fetchCartItems({ userId: user?.id }));
+        toast({ title: "Cart item deleted successfully" });
+      } else {
         toast({
           title: "Failed to delete cart item",
           variant: "destructive",
@@ -81,12 +74,12 @@ export default function UserCartItemsContent({ cartItem }) {
   return (
     <div className="flex items-center space-x-4">
       <img
-        src={cartItem.productId.image} // Correctly accessing the image
-        alt={cartItem.productId.title} // Correctly accessing the title
+        src={cartItem.productId.image}
+        alt={cartItem.productId.title}
         className="w-20 h-20 rounded object-cover"
       />
       <div className="flex-1">
-        <h3 className="font-extrabold">{cartItem.productId.title}</h3> {/* Correctly accessing the title */}
+        <h3 className="font-extrabold">{cartItem.productId.title}</h3>
         <div className="flex items-center gap-2 mt-1">
           <Button
             variant="outline"
@@ -98,7 +91,7 @@ export default function UserCartItemsContent({ cartItem }) {
             <Minus className="w-4 h-4" />
             <span className="sr-only">Decrease</span>
           </Button>
-          <span className="font-semibold">{cartItem.quantity}</span> {/* Using cartItem.quantity correctly */}
+          <span className="font-semibold">{cartItem.quantity}</span>
           <Button
             variant="outline"
             className="h-8 w-8 rounded-full"
@@ -106,7 +99,7 @@ export default function UserCartItemsContent({ cartItem }) {
             onClick={() => handleUpdateQuantity(cartItem, "plus")}
           >
             <Plus className="w-4 h-4" />
-            <span className="sr-only">Plus</span>
+            <span className="sr-only">Increase</span>
           </Button>
         </div>
       </div>

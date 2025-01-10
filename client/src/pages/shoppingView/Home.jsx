@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { addToCart, fetchCartItems } from '@/store/shop/cartslice';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailsDialog from '@/components/shoppingView/product-details';
+import { getFeatureImages } from '@/store/common-slice';
 
 function ShoppingHome() {
   const {toast}=useToast();
@@ -25,6 +26,8 @@ function ShoppingHome() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const navigate = useNavigate();
   const {user}=useSelector(state => state.auth);
+  const { featureImageList } = useSelector((state) => state.commonFeature);
+
   const categoriesWithIcons = [
     { id: "men", label: "Men", Icon: ShirtIcon },
     { id: "women", label: "Women", Icon: CloudLightning },
@@ -75,11 +78,11 @@ function ShoppingHome() {
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide(prevSlide => (prevSlide + 1) % slides.length);
+    setCurrentSlide(prevSlide => (prevSlide + 1) % featureImageList.length);
   };
 
   const handlePrevSlide = () => {
-    setCurrentSlide(prevSlide => (prevSlide - 1 + slides.length) % slides.length);
+    setCurrentSlide(prevSlide => (prevSlide - 1 + featureImageList.length) % featureImageList.length);
   };
 
   useEffect(() => {
@@ -87,6 +90,10 @@ function ShoppingHome() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    dispatch(getFeatureImages());
+  }, [dispatch]);
+   
   useEffect(() => {
     dispatch(fetchAllFilteredProduct({ filterParams: {}, sortParams: 'price-lowtohigh' }));
   }, []); // Empty dependency array to avoid unnecessary re-renders
@@ -100,16 +107,16 @@ function ShoppingHome() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="relative w-full h-[600px] overflow-hidden">
-        {slides.map((slide, index) => (
+        {featureImageList && featureImageList.length>0 ? featureImageList.map((slide, index) => (
           <img
-            src={slide}
+            src={slide?.image}
             key={index}
             className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
             alt={`Slide ${index + 1}`}
           />
-        ))}
+        )):null}
         <Button
           variant="secondary"
           size="icon"

@@ -85,14 +85,11 @@ export default function ShoppingOrders() {
                           Details
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-lg p-6">
-                        <DialogHeader>
-                          <DialogTitle>Order Details</DialogTitle>
-                        </DialogHeader>
+                      
                         {orderDetails && selectedOrderId === order._id && (
                           <ShoppingOrderDetailsView orderDetails={orderDetails} />
                         )}
-                      </DialogContent>
+                      
                     </Dialog>
                   </TableCell>
                 </TableRow>

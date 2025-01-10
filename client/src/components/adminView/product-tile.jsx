@@ -6,12 +6,12 @@ function AdminProductTile({ product,setFormData,setOpenCreateProductsDialog,setC
 
   return (
  <div className="flex">
-       <Card className="w-full  max-w-xs mx-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+       <Card className="w-full   max-w-xs mx-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
       <div className="relative">
         <img
           src={product?.image || 'fallback-image-url.jpg'}
           alt={product?.title || 'Product image'}
-          className="w-full h-56 object-cover rounded-t-lg"
+          className="w-full h-96 object-cover rounded-t-lg"
         />
       </div>
       <CardContent className="p-4">
