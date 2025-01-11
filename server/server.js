@@ -20,17 +20,23 @@ mongoose.connect(process.env.MONGODB_URL)
   })
   .catch((error) => console.log(error));
 
+
 const app = express();
+const PORT =process.env.PORT;
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.ORIGIN,
-  methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Expires', 'Pragma'],
-  credentials: true,
+  origin: process.env.ORIGIN, // Allow your frontend domain
+  methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'], // Explicitly allow all necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Expires', 'Pragma'], // Allow necessary headers
+  credentials: true, // Allow credentials (cookies, authorization headers)
 }));
 
-// Middleware
+
+// Explicitly handle preflight requests (OPTIONS) for all routes
+app.options('*', cors());
+
+// Middleware 
 app.use(cookieParser());
 app.use(express.json());
 
@@ -44,14 +50,19 @@ app.use('/api/shop/address', shopAddressRouter);
 app.use('/api/shop/order', shopOrderRouter);
 app.use('/api/shop/search', shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
+
 app.use("/api/common/feature", commonFeatureRouter);
 
-// Root endpoint
 app.get('/', (req, res) => {
-  res.status(200).json({
-    "message": "Hello world"
-  });
+  res.status(200).send(
+    '<p>Helllo world</p>'
+  );
 });
 
 // Export the app as a Vercel serverless function
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 module.exports = app;
