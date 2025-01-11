@@ -12,7 +12,7 @@ export const addAddress = createAsyncThunk(
   'address/addAddress',
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/shop/address/add', 
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/shop/address/add`, 
         formData
       );
       return response.data;
@@ -27,7 +27,7 @@ export const fetchAllAddress = createAsyncThunk(
   'address/fetchAllAddress',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/shop/address/get/${userId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/shop/address/get/${userId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || error.message);
@@ -40,7 +40,7 @@ export const editAddress = createAsyncThunk(
   'address/editAddress',
   async ({ userId, addressId, formData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/shop/address/edit/${userId}/${addressId}`, formData);
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/shop/address/edit/${userId}/${addressId}`, formData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || error.message);
@@ -53,7 +53,7 @@ export const deleteAddress = createAsyncThunk(
   'address/deleteAddress',
   async ({ userId, addressId }, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`http://localhost:8000/api/shop/address/delete/${userId}/${addressId}`);
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/shop/address/delete/${userId}/${addressId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || error.message);

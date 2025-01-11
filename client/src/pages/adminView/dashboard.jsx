@@ -26,9 +26,7 @@ function AdminDashboard() {
     });
   }
 
-  useEffect(() => {
-    dispatch(getFeatureImages());
-  }, [dispatch]);
+  
 
   console.log(featureImageList, "featureImageList");
 

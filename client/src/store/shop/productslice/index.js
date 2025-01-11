@@ -11,7 +11,7 @@ export const fetchAllFilteredProduct = createAsyncThunk(
      })
         try {
             // Axios GET request with credentials
-            const response = await axios.get(`http://localhost:8000/api/shop/products/get?${query}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/shop/products/get?${query}`, {
                 withCredentials: true,
             });
             return response.data; // Return response data on success
@@ -27,7 +27,7 @@ export const getProductDetails = createAsyncThunk(
     async (id,{rejectWithValue}) => {
         try {
             // Axios GET request with credentials
-            const result = await axios.get(`http://localhost:8000/api/shop/products/get/${id}`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}/api/shop/products/get/${id}`, {
                 withCredentials: true,
             });
             

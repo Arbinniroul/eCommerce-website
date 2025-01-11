@@ -12,7 +12,7 @@ export const fetchAllProduct = createAsyncThunk(
     "adminProducts/fetchAllProducts",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8000/api/admin/products/get");
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/products/get`);
             return response.data; // Ensure this matches API response structure
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
@@ -25,7 +25,7 @@ export const addNewProduct = createAsyncThunk(
     "adminProducts/addNewProduct",
     async (formData, { rejectWithValue }) => {
         try {
-            const response = await axios.post("http://localhost:8000/api/admin/products/add", formData, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/products/add`, formData, {
                 headers: { "Content-type": "application/json" },
             });
             return response.data;
@@ -41,7 +41,7 @@ export const editProduct = createAsyncThunk(
     async ({ id, formData }, { rejectWithValue }) => {
         try {
             const response = await axios.put(
-                `http://localhost:8000/api/admin/products/edit/${id}`,
+                `${import.meta.env.VITE_API_URL}/api/admin/products/edit/${id}`,
                 formData,
                 { headers: { "Content-type": "application/json" } }
             );
@@ -58,7 +58,7 @@ export const deleteProduct = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await axios.delete(
-                `http://localhost:8000/api/admin/products/delete/${id}`,
+                `${import.meta.env.VITE_API_URL}/api/admin/products/delete/${id}`,
                 { headers: { "Content-type": "application/json" } }
             );
             return response.data;
