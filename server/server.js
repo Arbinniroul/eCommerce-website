@@ -23,7 +23,9 @@ mongoose.connect(process.env.MONGODB_URL)
 
 const app = express();
 const PORT =process.env.PORT || 8000;
-
+app.get('/', (req, res) => {
+  res.send(<p>Hello world</p>);
+});
 // CORS configuration
 app.use(cors({
   origin: process.env.ORIGIN, // Allow your frontend domain
@@ -52,9 +54,7 @@ app.use('/api/shop/search', shopSearchRouter);
 app.use("/api/shop/review", shopReviewRouter);
 
 app.use("/api/common/feature", commonFeatureRouter);
-app.get('/', (req, res) => {
-  res.json("Hello");
-});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
