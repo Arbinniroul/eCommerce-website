@@ -22,11 +22,11 @@ mongoose.connect(process.env.MONGODB_URL)
 
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT =process.env.PORT || 8000;
 
 // CORS configuration
 app.use(cors({
-  origin:  process.env.ORIGIN, // Allow your frontend domain
+  origin: process.env.ORIGIN, // Allow your frontend domain
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'], // Explicitly allow all necessary methods
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Expires', 'Pragma'], // Allow necessary headers
   credentials: true, // Allow credentials (cookies, authorization headers)
