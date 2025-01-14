@@ -20,7 +20,7 @@ import UserCartWrapper from "./cart-wrapper";
 import { fetchCartItems } from "@/store/shop/cartslice";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { getProductDetails } from "@/store/shop/productslice";
-import { set } from "mongoose";
+
 
 
 const MenuItems = () => {
