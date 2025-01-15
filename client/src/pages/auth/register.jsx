@@ -33,7 +33,7 @@ function AuthRegister() {
         }
         toast({
           title: response?.payload?.message,
-          variant: "destructive" ,
+
         });
         console.log(response); // Check the response data
       })
